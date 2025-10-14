@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Expense Splitter - Spendry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/split.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Spendry</div>
+        <ul class="menu">
+            <li class="menu-item"><a href="index.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+            <li class="menu-item"><a href="expense.html"><i class='bx bx-receipt'></i><span>Expenses</span></a></li>
+            <li class="menu-item active"><a href="split-bill.html"><i class='bx bx-group'></i><span>Split Bills</span></a></li>
+            <li class="menu-item"><a href="budget-management.html"><i class='bx bx-bar-chart-alt'></i><span>Budgets</span></a></li>
+            <li class="menu-item"><a href="#"><i class='bx bx-cog'></i><span>Settings</span></a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="top-bar">
+            <i class='bx bx-bell'></i>
+            <div class="user-profile" id="userProfile">A</div>
+        </div>
+        <div class="header">
+            <div class="header-title">
+                <h1>Expense Splitter</h1>
+                <p>Split bills and track group expenses with friends</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="joinGroupBtn"><i class='bx bx-user-plus'></i> Join Group</button>
+                <button class="text-btn" id="createGroupBtn">Create Group</button>
+            </div>
+        </div>
+        <div class="group-list" id="groupList"></div>
+    </div>
+
+    <!-- Group Detail Modal -->
+    <div class="modal" id="groupDetailModal">
+        <div class="modal-content group-detail" id="groupDetailContent">
+            <span class="modal-close" id="closeGroupDetailModalBtn">&times;</span>
+            <div id="groupDetailBody"></div>
+        </div>
+    </div>
+    <!-- Create Group Modal -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeCreateGroupModalBtn">&times;</span>
+            <h2>Create Group</h2>
+            <div class="modal-error" id="createGroupModalError"></div>
+            <form id="createGroupForm" autocomplete="off">
+                <label for="groupNameInput">Group Name</label>
+                <input type="text" id="groupNameInput" required maxlength="50" placeholder="e.g. Goa Tour">
+                <label for="groupDescInput">Description</label>
+                <input type="text" id="groupDescInput" maxlength="100" placeholder="e.g. Friends Goa Trip">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelCreateGroupBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Join Group Modal -->
+    <div class="modal" id="joinGroupModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeJoinGroupModalBtn">&times;</span>
+            <h2>Join Group</h2>
+            <div class="modal-error" id="joinGroupModalError"></div>
+            <form id="joinGroupForm" autocomplete="off">
+                <label for="inviteCodeInput">Invite Code</label>
+                <input type="text" id="inviteCodeInput" required maxlength="10" placeholder="e.g. 6H3K68">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelJoinGroupBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Join</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Add Splitted Expense Modal -->
+    <div class="modal" id="splittedExpenseModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeSplittedExpenseModalBtn">&times;</span>
+            <h2>Add Group Expense</h2>
+            <div class="modal-error" id="splittedModalError"></div>
+            <form id="splittedExpenseForm" autocomplete="off">
+                <label for="splittedExpenseTitle">Title</label>
+                <input type="text" id="splittedExpenseTitle" required maxlength="50" placeholder="e.g. Hotel Booking">
+                <label for="splittedExpenseAmount">Amount (₹)</label>
+                <input type="number" id="splittedExpenseAmount" required min="1" placeholder="e.g. 5000">
+                <label for="splittedExpenseDate">Date</label>
+                <input type="date" id="splittedExpenseDate" required>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelSplittedExpenseBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeAddMemberModalBtn">&times;</span>
+            <h2>Add Member</h2>
+            <div class="modal-error" id="addMemberModalError"></div>
+            <form id="addMemberForm" autocomplete="off">
+                <label for="memberNameInput">Name</label>
+                <input type="text" id="memberNameInput" required maxlength="50" placeholder="e.g. John">
+                <label for="memberEmailInput">Email</label>
+                <input type="email" id="memberEmailInput" required maxlength="100" placeholder="e.g. john@email.com">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelAddMemberBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Firebase SDKs (modular style) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSFQmoSeZFWuAAa1FlRh-0KFhAj9wjQDQ",
+            authDomain: "spendry-83327.firebaseapp.com",
+            projectId: "spendry-83327",
+            storageBucket: "spendry-83327.appspot.com",
+            messagingSenderId: "423479822230",
+            appId: "1:423479822230:web:6b588326c585cda714bfb7",
+            measurementId: "G-Z2Z0N7LBZX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let groups = [];
+        let groupMap = {};
+        let splittedExpensesMap = {};
+
+        function generateInviteCode(length = 6) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < length; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
+
+        function setupModal(modalId, openBtnId, closeBtnId, cancelBtnId) {
+            const modal = document.getElementById(modalId);
+            if (openBtnId) document.getElementById(openBtnId).onclick = () => { modal.classList.add('active'); };
+            if (closeBtnId) document.getElementById(closeBtnId).onclick = () => { modal.classList.remove('active'); };
+            if (cancelBtnId) document.getElementById(cancelBtnId).onclick = () => { modal.classList.remove('active'); };
+            window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+        }
+        setupModal('createGroupModal', 'createGroupBtn', 'closeCreateGroupModalBtn', 'cancelCreateGroupBtn');
+        setupModal('joinGroupModal', 'joinGroupBtn', 'closeJoinGroupModalBtn', 'cancelJoinGroupBtn');
+        setupModal('splittedExpenseModal', null, 'closeSplittedExpenseModalBtn', 'cancelSplittedExpenseBtn');
+        setupModal('addMemberModal', null, 'closeAddMemberModalBtn', 'cancelAddMemberBtn');
+        setupModal('groupDetailModal', null, 'closeGroupDetailModalBtn', null);
+
+        function setUserProfile() {
+            const userProfile = document.getElementById('userProfile');
+            let userName = localStorage.getItem('userName') || '';
+            userProfile.textContent = userName ? userName[0].toUpperCase() : 'U';
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        async function fetchGroups() {
+            if (!currentUser) return;
+            const q = query(collection(db, "groups"), where("memberUids", "array-contains", currentUser.uid));
+            const querySnapshot = await getDocs(q);
+            groups = [];
+            groupMap = {};
+            splittedExpensesMap = {};
+            for (const docSnap of querySnapshot.docs) {
+                const group = { id: docSnap.id, ...docSnap.data() };
+                groups.push(group);
+                groupMap[group.id] = group;
+                splittedExpensesMap[group.id] = await fetchSplittedExpenses(group.id);
+            }
+            renderGroupList();
+        }
+
+        async function fetchSplittedExpenses(groupId) {
+            const q = query(collection(db, "splitted_expenses"), where("groupId", "==", groupId));
+            const querySnapshot = await getDocs(q);
+            let expenses = [];
+            querySnapshot.forEach(docSnap => {
+                expenses.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+            return expenses;
+        }
+
+        function renderGroupList() {
+            const groupList = document.getElementById('groupList');
+            groupList.innerHTML = '';
+            if (!groups.length) {
+                groupList.innerHTML = `<div style="color:#888; padding:40px 0;">No groups yet. Create or join a group!</div>`;
+                return;
+            }
+            groups.forEach(group => {
+                const total = (splittedExpensesMap[group.id] || []).reduce((sum, exp) => sum + Number(exp.amount), 0);
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.innerHTML = `
+                    <div class="group-title">${group.name}</div>
+                    <div class="group-desc">${group.description || 'No description'}</div>
+                    <div class="group-exp">Total Expenses: ₹${total.toLocaleString()}</div>
+                    <button class="btn view-btn">View</button>
+                `;
+                card.querySelector('.view-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    showGroupDetail(group.id);
+                };
+                card.onclick = () => showGroupDetail(group.id);
+                groupList.appendChild(card);
+            });
+        }
+
+        async function showGroupDetail(groupId) {
+            const group = groupMap[groupId];
+            if (!group) return;
+            const expenses = splittedExpensesMap[groupId] || [];
+            const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+            let membersHtml = '';
+            (group.members || []).forEach((m, idx) => {
+                membersHtml += `
+                    <div class="member">
+                        <div class="avatar">${m.name ? m.name[0].toUpperCase() : 'U'}</div>
+                        <span>${m.name || m.email}</span>
+                        ${m.uid !== currentUser.uid ? `<span class="remove-member" data-idx="${idx}" title="Remove Member">&times;</span>` : ''}
+                    </div>
+                `;
+            });
+            let expensesHtml = '';
+            if (!expenses.length) {
+                expensesHtml = `<div style="color:#888; padding:20px 0;">No group expenses yet.</div>`;
+            } else {
+                expenses.forEach(exp => {
+                    expensesHtml += `
+                        <div class="splitted-expense-item">
+                            <div>
+                                <div class="splitted-expense-title">${exp.title}</div>
+                                <div class="splitted-expense-meta">${formatDate(exp.date)} &middot; Added by ${exp.addedByName || 'Someone'}</div>
+                            </div>
+                            <div class="splitted-expense-amount">₹${Number(exp.amount).toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('groupDetailBody').innerHTML = `
+                <div style="font-size:1.5rem;font-weight:700;margin-bottom:2px;">${group.name}</div>
+                <div style="color:#888;margin-bottom:8px;">${group.description || 'No description'}</div>
+                <div class="invite-code">
+                    <span>Invite Code</span>
+                    <p>${group.inviteCode || 'N/A'}</p>
+                </div>
+                <div class="members-title">Members (${(group.members || []).length})</div>
+                <div class="member-list">${membersHtml}</div>
+                <button class="add-member-btn" id="addMemberBtnModal">Add Member</button>
+                <div class="total-expenses">Total Expenses: ₹<span id="totalGroupExpensesModal">${total.toLocaleString()}</span>
+                    <button class="text-btn add-expense-btn" id="addSplittedExpenseBtnModal">Add Expense</button>
+                </div>
+                <div class="splitted-expenses-list">${expensesHtml}</div>
+            `;
+            document.getElementById('groupDetailModal').classList.add('active');
+            // Remove member logic
+            Array.from(document.querySelectorAll('.remove-member')).forEach(el => {
+                el.onclick = async function(e) {
+                    e.stopPropagation();
+                    const idx = Number(this.getAttribute('data-idx'));
+                    if (confirm('Remove this member from group?')) {
+                        await removeMemberFromGroup(groupId, group.members[idx]);
+                    }
+                };
+            });
+            // Add member button
+            document.getElementById('addMemberBtnModal').onclick = function() {
+                document.getElementById('addMemberModal').classList.add('active');
+                document.getElementById('addMemberModalError').textContent = '';
+                document.getElementById('addMemberForm').reset();
+                window._currentGroupIdForMember = groupId;
+            };
+            // Add expense button
+            document.getElementById('addSplittedExpenseBtnModal').onclick = function() {
+                document.getElementById('splittedExpenseModal').classList.add('active');
+                document.getElementById('splittedModalError').textContent = '';
+                document.getElementById('splittedExpenseForm').reset();
+                document.getElementById('splittedExpenseDate').value = new Date().toISOString().slice(0,10);
+                window._currentGroupIdForExpense = groupId;
+            };
+        }
+
+        async function removeMemberFromGroup(groupId, member) {
+            try {
+                const groupRef = doc(db, "groups", groupId);
+                await updateDoc(groupRef, {
+                    members: arrayRemove(member)
+                });
+                await fetchGroups();
+                document.getElementById('groupDetailModal').classList.remove('active');
+            } catch (err) {
+                alert("Failed to remove member.");
+            }
+        }
+
+        document.getElementById('createGroupForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('createGroupModalError');
+            errorDiv.textContent = '';
+            const name = document.getElementById('groupNameInput').value.trim();
+            const description = document.getElementById('groupDescInput').value.trim();
+            if (!name) {
+                errorDiv.textContent = "Group name is required.";
+                return;
+            }
+            try {
+                const inviteCode = generateInviteCode();
+                const groupDoc = await addDoc(collection(db, "groups"), {
+                    name,
+                    description,
+                    inviteCode,
+                    members: [{ name: localStorage.getItem('userName') || currentUser.email, email: currentUser.email, uid: currentUser.uid }],
+                    memberUids: [currentUser.uid]
+                });
+                document.getElementById('createGroupModal').classList.remove('active');
+                await fetchGroups();
+            } catch (err) {
+                errorDiv.textContent = "Failed to create group.";
+            }
+        };
+
+        document.getElementById('joinGroupForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('joinGroupModalError');
+            errorDiv.textContent = '';
+            const inviteCode = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+            if (!inviteCode) {
+                errorDiv.textContent = "Invite code is required.";
+                return;
+            }
+            try {
+                const q = query(collection(db, "groups"), where("inviteCode", "==", inviteCode));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    errorDiv.textContent = "Invalid invite code.";
+                    return;
+                }
+                let groupDocId = null;
+                let groupData = null;
+                querySnapshot.forEach(docSnap => {
+                    groupDocId = docSnap.id;
+                    groupData = docSnap.data();
+                });
+                if ((groupData.memberUids || []).includes(currentUser.uid)) {
+                    errorDiv.textContent = "You are already a member of this group.";
+                    return;
+                }
+                const groupRef = doc(db, "groups", groupDocId);
+                await updateDoc(groupRef, {
+                    members: arrayUnion({ name: localStorage.getItem('userName') || currentUser.email, email: currentUser.email, uid: currentUser.uid }),
+                    memberUids: arrayUnion(currentUser.uid)
+                });
+                document.getElementById('joinGroupModal').classList.remove('active');
+                await fetchGroups();
+            } catch (err) {
+                errorDiv.textContent = "Failed to join group.";
+            }
+        };
+
+        document.getElementById('splittedExpenseForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const splittedModalError = document.getElementById('splittedModalError');
+            splittedModalError.textContent = '';
+            const title = document.getElementById('splittedExpenseTitle').value.trim();
+            const amount = Number(document.getElementById('splittedExpenseAmount').value);
+            const date = document.getElementById('splittedExpenseDate').value;
+            const groupId = window._currentGroupIdForExpense;
+            if (!title || !amount || !date || !groupId) {
+                splittedModalError.textContent = "All fields are required.";
+                return;
+            }
+            try {
+                let userName = localStorage.getItem('userName') || currentUser.email;
+                await addDoc(collection(db, "splitted_expenses"), {
+                    groupId,
+                    title,
+                    amount,
+                    date,
+                    addedBy: currentUser.uid,
+                    addedByName: userName
+                });
+                document.getElementById('splittedExpenseModal').classList.remove('active');
+                await fetchGroups();
+                document.getElementById('groupDetailModal').classList.remove('active');
+            } catch (err) {
+                splittedModalError.textContent = "Failed to add group expense. Try again.";
+            }
+        };
+
+        document.getElementById('addMemberForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('addMemberModalError');
+            errorDiv.textContent = '';
+            const name = document.getElementById('memberNameInput').value.trim();
+            const email = document.getElementById('memberEmailInput').value.trim();
+            const groupId = window._currentGroupIdForMember;
+            if (!name || !email || !groupId) {
+                errorDiv.textContent = "All fields are required.";
+                return;
+            }
+            try {
+                const groupRef = doc(db, "groups", groupId);
+                const groupSnap = await getDoc(groupRef);
+                if (!groupSnap.exists()) throw new Error("Group not found");
+                const group = groupSnap.data();
+                if ((group.members || []).some(m => m.email === email)) {
+                    errorDiv.textContent = "Member already exists.";
+                    return;
+                }
+                await updateDoc(groupRef, {
+                    members: arrayUnion({ name, email }),
+                });
+                document.getElementById('addMemberModal').classList.remove('active');
+                await fetchGroups();
+                document.getElementById('groupDetailModal').classList.remove('active');
+            } catch (err) {
+                errorDiv.textContent = "Failed to add member.";
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                currentUser = user;
+                setUserProfile();
+                await fetchGroups();
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('invite')) {
+                    document.getElementById('joinGroupModal').classList.add('active');
+                    document.getElementById('inviteCodeInput').value = params.get('invite');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
