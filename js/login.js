@@ -1,4 +1,3 @@
-// login.js
 import { auth, db } from './firebase.js';
 import {
     createUserWithEmailAndPassword,
@@ -22,6 +21,10 @@ const submitButton = document.getElementById('submitButton');
 const signInBtn = document.getElementById('signInBtn');
 const signUpBtn = document.getElementById('signUpBtn');
 const msgDiv = document.getElementById('msg');
+const signupFields = document.getElementById('signupFields');
+const firstNameInput = document.getElementById('firstName');
+const lastNameInput = document.getElementById('lastName');
+const phoneInput = document.getElementById('phone');
 
 // Switch between Sign In and Sign Up
 function toggleAuthMode(signIn) {
@@ -30,6 +33,8 @@ function toggleAuthMode(signIn) {
     signUpBtn.classList.toggle('active', !isSignIn);
     submitButton.textContent = isSignIn ? 'Sign In' : 'Sign Up';
     msgDiv.innerHTML = '';
+    // Show/hide extra fields
+    signupFields.classList.toggle('hidden', isSignIn);
 }
 signInBtn.addEventListener('click', () => toggleAuthMode(true));
 signUpBtn.addEventListener('click', () => toggleAuthMode(false));
@@ -40,6 +45,18 @@ form.addEventListener('submit', async (e) => {
     msgDiv.innerHTML = '';
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
+
+    if (!isSignIn) {
+        // Validate extra fields for sign up
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        if (!firstName || !lastName || !phone) {
+            msgDiv.innerHTML = `<div class="error-msg">Please fill in all sign up fields.</div>`;
+            return;
+        }
+    }
+
     try {
         if (isSignIn) {
             // Sign In
@@ -47,11 +64,16 @@ form.addEventListener('submit', async (e) => {
             await afterLogin(userCred.user);
         } else {
             // Sign Up
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const phone = phoneInput.value.trim();
             const userCred = await createUserWithEmailAndPassword(auth, email, password);
             // Save user profile in Firestore
-            const name = email.split('@')[0];
             await setDoc(doc(db, "users", userCred.user.uid), {
-                name: name,
+                name: `${firstName} ${lastName}`,
+                firstName: firstName,
+                lastName: lastName,
+                phone: phone,
                 email: email,
                 createdAt: new Date().toISOString()
             });
@@ -85,13 +107,17 @@ async function afterLogin(user) {
     }
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userName', name);
+    localStorage.setItem('userId', user.uid);
     setTimeout(() => { window.location.href = 'index.html'; }, 800);
 }
 
-  // Re-added the logout listener for the sidebar link
-        document.getElementById('logoutBtnSidebar').addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('userName');
-            window.location.href = 'login.html';
-        });
+// Re-added the logout listener for the sidebar link
+const logoutBtnSidebar = document.getElementById('logoutBtnSidebar');
+if (logoutBtnSidebar) {
+    logoutBtnSidebar.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.setItem('isLoggedIn', 'false');
+        localStorage.removeItem('userName');
+        window.location.href = 'login.html';
+    });
+}

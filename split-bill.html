@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/split.css">
+    <style>
+        /* --- MODIFIED/ADDED --- */
+        .member-split-amount {
+            font-size: 0.95rem;
+            color: #2e7d32;
+            margin-top: 2px;
+            margin-bottom: 8px;
+        }
+        .member-list {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="sidebar">
@@ -16,11 +28,11 @@
             <li class="menu-item"><a href="expense.html"><i class='bx bx-receipt'></i><span>Expenses</span></a></li>
             <li class="menu-item active"><a href="split-bill.html"><i class='bx bx-group'></i><span>Split Bills</span></a></li>
             <li class="menu-item"><a href="budget-management.html"><i class='bx bx-bar-chart-alt'></i><span>Budgets</span></a></li>
-            <li class="menu-item"><a href="#"><i class='bx bx-cog'></i><span>Settings</span></a></li>
         </ul>
     </div>
     <div class="main-content">
         <div class="top-bar">
+            
             <i class='bx bx-bell'></i>
             <div class="user-profile" id="userProfile">A</div>
         </div>
@@ -89,6 +101,18 @@
                 <input type="text" id="splittedExpenseTitle" required maxlength="50" placeholder="e.g. Hotel Booking">
                 <label for="splittedExpenseAmount">Amount (₹)</label>
                 <input type="number" id="splittedExpenseAmount" required min="1" placeholder="e.g. 5000">
+                <label for="splittedExpenseCategory">Category</label>
+                <select id="splittedExpenseCategory" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Food">Food</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
                 <label for="splittedExpenseDate">Date</label>
                 <input type="date" id="splittedExpenseDate" required>
                 <div class="modal-actions">
@@ -116,6 +140,39 @@
             </form>
         </div>
     </div>
+
+    <!-- Edit Expense Modal -->
+<div class="modal" id="editExpenseModal">
+    <div class="modal-content">
+        <span class="modal-close" id="closeEditExpenseModalBtn">&times;</span>
+        <h2>Edit Group Expense</h2>
+        <div class="modal-error" id="editExpenseModalError"></div>
+        <form id="editExpenseForm" autocomplete="off">
+            <label for="editExpenseTitle">Title</label>
+            <input type="text" id="editExpenseTitle" required maxlength="50" placeholder="e.g. Hotel Booking">
+            <label for="editExpenseAmount">Amount (₹)</label>
+            <input type="number" id="editExpenseAmount" required min="1" placeholder="e.g. 5000">
+            <label for="editExpenseCategory">Category</label>
+            <select id="editExpenseCategory" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Travel">Travel</option>
+                <option value="Food">Food</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Health">Health</option>
+                <option value="Education">Education</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Miscellaneous">Miscellaneous</option>
+            </select>
+            <label for="editExpenseDate">Date</label>
+            <input type="date" id="editExpenseDate" required>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" id="cancelEditExpenseBtn">Cancel</button>
+                <button type="submit" class="btn btn-add">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
     <!-- Firebase SDKs (modular style) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
@@ -226,21 +283,34 @@
             });
         }
 
+        // --- MODIFIED/ADDED: Helper to render member list with split amounts ---
+        function renderMemberListWithSplits(members, perMemberAmount, currentUserUid) {
+            let html = '';
+            (members || []).forEach((m, idx) => {
+                html += `
+                    <div class="member">
+                        <div class="avatar">${m.name ? m.name[0].toUpperCase() : 'U'}</div>
+                        <span>${m.name || m.email}</span>
+                        <div class="member-split-amount">Owes: ₹${perMemberAmount > 0 ? perMemberAmount.toFixed(2) : '0.00'}</div>
+                        ${m.uid && m.uid !== currentUserUid ? `<span class="remove-member" data-idx="${idx}" title="Remove Member">&times;</span>` : ''}
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        // --- MODIFIED: showGroupDetail now uses renderMemberListWithSplits ---
         async function showGroupDetail(groupId) {
             const group = groupMap[groupId];
             if (!group) return;
             const expenses = splittedExpensesMap[groupId] || [];
             const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
-            let membersHtml = '';
-            (group.members || []).forEach((m, idx) => {
-                membersHtml += `
-                    <div class="member">
-                        <div class="avatar">${m.name ? m.name[0].toUpperCase() : 'U'}</div>
-                        <span>${m.name || m.email}</span>
-                        ${m.uid !== currentUser.uid ? `<span class="remove-member" data-idx="${idx}" title="Remove Member">&times;</span>` : ''}
-                    </div>
-                `;
-            });
+            const memberCount = (group.members || []).length || 1;
+            const perMember = total / memberCount;
+
+            // --- Use helper to render member list with split amounts ---
+            let membersHtml = renderMemberListWithSplits(group.members, perMember, currentUser.uid);
+
             let expensesHtml = '';
             if (!expenses.length) {
                 expensesHtml = `<div style="color:#888; padding:20px 0;">No group expenses yet.</div>`;
@@ -248,12 +318,14 @@
                 expenses.forEach(exp => {
                     expensesHtml += `
                         <div class="splitted-expense-item">
-                            <div>
-                                <div class="splitted-expense-title">${exp.title}</div>
-                                <div class="splitted-expense-meta">${formatDate(exp.date)} &middot; Added by ${exp.addedByName || 'Someone'}</div>
-                            </div>
-                            <div class="splitted-expense-amount">₹${Number(exp.amount).toLocaleString()}</div>
-                        </div>
+            <div>
+                <div class="splitted-expense-title">${exp.title}</div>
+                <div class="splitted-expense-meta">${formatDate(exp.date)} &middot; Added by ${exp.addedByName || 'Someone'}</div>
+                <div class="splitted-expense-category">Category: ${exp.category || 'N/A'}</div>
+            </div>
+            <div class="splitted-expense-amount">₹${Number(exp.amount).toLocaleString()}</div>
+            <button class="text-btn edit-expense-btn" data-expense-id="${exp.id}" data-group-id="${groupId}">Edit</button>
+        </div>
                     `;
                 });
             }
@@ -265,14 +337,16 @@
                     <p>${group.inviteCode || 'N/A'}</p>
                 </div>
                 <div class="members-title">Members (${(group.members || []).length})</div>
-                <div class="member-list">${membersHtml}</div>
+                <div class="member-list" id="memberListWithSplits">${membersHtml}</div>
                 <button class="add-member-btn" id="addMemberBtnModal">Add Member</button>
                 <div class="total-expenses">Total Expenses: ₹<span id="totalGroupExpensesModal">${total.toLocaleString()}</span>
                     <button class="text-btn add-expense-btn" id="addSplittedExpenseBtnModal">Add Expense</button>
                 </div>
                 <div class="splitted-expenses-list">${expensesHtml}</div>
+                <button class="btn split-expense-btn" id="splitExpenseBtn">Split Amount</button>
             `;
             document.getElementById('groupDetailModal').classList.add('active');
+
             // Remove member logic
             Array.from(document.querySelectorAll('.remove-member')).forEach(el => {
                 el.onclick = async function(e) {
@@ -298,7 +372,76 @@
                 document.getElementById('splittedExpenseDate').value = new Date().toISOString().slice(0,10);
                 window._currentGroupIdForExpense = groupId;
             };
+            // Split amount button
+            document.getElementById('splitExpenseBtn').onclick = function() {
+                // --- MODIFIED: Update split amounts below each member ---
+                updateMemberSplits(groupId);
+            };
         }
+
+        // --- ADDED: Function to update split amounts below each member ---
+        function updateMemberSplits(groupId) {
+            const group = groupMap[groupId];
+            const expenses = splittedExpensesMap[groupId] || [];
+            const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+            const memberCount = (group.members || []).length || 1;
+            const perMember = total / memberCount;
+            const memberListDiv = document.getElementById('memberListWithSplits');
+            if (memberListDiv) {
+                memberListDiv.innerHTML = renderMemberListWithSplits(group.members, perMember, currentUser.uid);
+                // Re-attach remove member events
+                Array.from(document.querySelectorAll('.remove-member')).forEach(el => {
+                    el.onclick = async function(e) {
+                        e.stopPropagation();
+                        const idx = Number(this.getAttribute('data-idx'));
+                        if (confirm('Remove this member from group?')) {
+                            await removeMemberFromGroup(groupId, group.members[idx]);
+                        }
+                    };
+                });
+            }
+        }
+
+        async function updateBudgetForExpense(category, amount) {
+    try {
+        // Query the budget for the given category
+        const q = query(
+            collection(db, "budgets"),
+            where("ownerId", "==", currentUser.uid),
+            where("category", "==", category)
+        );
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            console.warn(`No budget found for category: ${category}`);
+            return;
+        }
+
+        // Update the budget's spent value
+        let budgetDocId = null;
+        let budgetData = null;
+        snapshot.forEach(docSnap => {
+            budgetDocId = docSnap.id;
+            budgetData = docSnap.data();
+        });
+
+        if (!budgetDocId || !budgetData) return;
+
+        const updatedSpent = (budgetData.spent || 0) + amount;
+
+        // Update the budget in Firestore
+        await updateDoc(doc(db, "budgets", budgetDocId), {
+            spent: updatedSpent
+        });
+
+        // Check if the updated spent value exceeds the budget limit
+        if (updatedSpent > budgetData.limit) {
+            alert(`Warning: You have exceeded the budget for ${category}!`);
+        }
+    } catch (err) {
+        console.error("Failed to update budget:", err);
+    }
+}
 
         async function removeMemberFromGroup(groupId, member) {
             try {
@@ -376,37 +519,45 @@
                 errorDiv.textContent = "Failed to join group.";
             }
         };
+    document.getElementById('splittedExpenseForm').onsubmit = async function(e) {
 
-        document.getElementById('splittedExpenseForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const splittedModalError = document.getElementById('splittedModalError');
-            splittedModalError.textContent = '';
-            const title = document.getElementById('splittedExpenseTitle').value.trim();
-            const amount = Number(document.getElementById('splittedExpenseAmount').value);
-            const date = document.getElementById('splittedExpenseDate').value;
-            const groupId = window._currentGroupIdForExpense;
-            if (!title || !amount || !date || !groupId) {
-                splittedModalError.textContent = "All fields are required.";
-                return;
-            }
-            try {
-                let userName = localStorage.getItem('userName') || currentUser.email;
-                await addDoc(collection(db, "splitted_expenses"), {
-                    groupId,
-                    title,
-                    amount,
-                    date,
-                    addedBy: currentUser.uid,
-                    addedByName: userName
-                });
-                document.getElementById('splittedExpenseModal').classList.remove('active');
-                await fetchGroups();
-                document.getElementById('groupDetailModal').classList.remove('active');
-            } catch (err) {
-                splittedModalError.textContent = "Failed to add group expense. Try again.";
-            }
-        };
+    e.preventDefault();
+    const splittedModalError = document.getElementById('splittedModalError');
+    splittedModalError.textContent = '';
+    const title = document.getElementById('splittedExpenseTitle').value.trim();
+    const amount = Number(document.getElementById('splittedExpenseAmount').value);
+    const category = document.getElementById('splittedExpenseCategory').value;
+    const date = document.getElementById('splittedExpenseDate').value;
+    const groupId = window._currentGroupIdForExpense;
 
+    if (!title || !amount || !category || !date || !groupId) {
+        splittedModalError.textContent = "All fields are required.";
+        return;
+    }
+
+    try {
+        let userName = localStorage.getItem('userName') || currentUser.email;
+        await addDoc(collection(db, "splitted_expenses"), {
+            groupId,
+            title,
+            amount,
+            category,
+            date,
+            addedBy: currentUser.uid,
+            addedByName: userName
+        });
+
+        // Update the budget for the selected category
+        await updateBudgetForExpense(category, amount);
+
+        document.getElementById('splittedExpenseModal').classList.remove('active');
+        await fetchGroups();
+        document.getElementById('groupDetailModal').classList.remove('active');
+        setTimeout(() => showGroupDetail(groupId), 300);
+    } catch (err) {
+        splittedModalError.textContent = "Failed to add group expense. Try again.";
+    }
+};
         document.getElementById('addMemberForm').onsubmit = async function(e) {
             e.preventDefault();
             const errorDiv = document.getElementById('addMemberModalError');
@@ -433,6 +584,8 @@
                 document.getElementById('addMemberModal').classList.remove('active');
                 await fetchGroups();
                 document.getElementById('groupDetailModal').classList.remove('active');
+                // --- MODIFIED: After adding member, re-open group detail to update splits ---
+                setTimeout(() => showGroupDetail(groupId), 300);
             } catch (err) {
                 errorDiv.textContent = "Failed to add member.";
             }
@@ -452,6 +605,69 @@
                 }
             }
         });
+
+        // Setup Edit Expense Modal
+setupModal('editExpenseModal', null, 'closeEditExpenseModalBtn', 'cancelEditExpenseBtn');
+
+// Handle Edit Expense Button Click
+document.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('edit-expense-btn')) {
+        const expenseId = e.target.getAttribute('data-expense-id');
+        const groupId = e.target.getAttribute('data-group-id');
+        const expense = (splittedExpensesMap[groupId] || []).find(exp => exp.id === expenseId);
+        if (!expense) return;
+
+        // Populate modal with expense details
+        document.getElementById('editExpenseTitle').value = expense.title;
+        document.getElementById('editExpenseAmount').value = expense.amount;
+        document.getElementById('editExpenseCategory').value = expense.category;
+        document.getElementById('editExpenseDate').value = expense.date;
+
+        // Store expense ID and group ID for submission
+        window._currentExpenseIdForEdit = expenseId;
+        window._currentGroupIdForEdit = groupId;
+
+        // Show the modal
+        document.getElementById('editExpenseModal').classList.add('active');
+    }
+});
+
+// Handle Edit Expense Form Submission
+document.getElementById('editExpenseForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const errorDiv = document.getElementById('editExpenseModalError');
+    errorDiv.textContent = '';
+
+    const title = document.getElementById('editExpenseTitle').value.trim();
+    const amount = Number(document.getElementById('editExpenseAmount').value);
+    const category = document.getElementById('editExpenseCategory').value;
+    const date = document.getElementById('editExpenseDate').value;
+    const expenseId = window._currentExpenseIdForEdit;
+    const groupId = window._currentGroupIdForEdit;
+
+    if (!title || !amount || !category || !date || !expenseId || !groupId) {
+        errorDiv.textContent = "All fields are required.";
+        return;
+    }
+
+    try {
+        const expenseRef = doc(db, "splitted_expenses", expenseId);
+        await updateDoc(expenseRef, {
+            title,
+            amount,
+            category,
+            date
+        });
+
+        document.getElementById('editExpenseModal').classList.remove('active');
+        await fetchGroups();
+        document.getElementById('groupDetailModal').classList.remove('active');
+        // Re-open group detail to update UI
+        setTimeout(() => showGroupDetail(groupId), 300);
+    } catch (err) {
+        errorDiv.textContent = "Failed to update expense. Try again.";
+    }
+};
     </script>
 </body>
 </html>

@@ -7,7 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/style.css">
-
+    <style>
+        /* Add styles for new fields (optional, for better spacing) */
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -20,6 +23,15 @@
         </div>
         <div id="msg"></div>
         <form id="authForm" autocomplete="off">
+            <!-- Sign Up extra fields (hidden by default) -->
+            <div id="signupFields" class="hidden">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" placeholder="Enter your first name">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" placeholder="Enter your last name">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter your phone number">
+            </div>
             <label for="email">Email</label>
             <input type="email" id="email" placeholder="Enter your email" required>
             <label for="password">Password</label>
@@ -27,7 +39,7 @@
             <button type="submit" class="btn-submit" id="submitButton">Sign In</button>
         </form>
     </div>
-
     <script type="module" src="./js/login.js"></script>
+    
 </body>
 </html>

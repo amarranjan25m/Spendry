@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/expense.css">
-  
 </head>
 <body>
 
@@ -18,43 +17,64 @@
             <li class="menu-item active"><a href="expense.html"><i class='bx bx-receipt'></i><span>Expenses</span></a></li>
             <li class="menu-item"><a href="split-bill.html"><i class='bx bx-group'></i><span>Split Bills</span></a></li>
             <li class="menu-item"><a href="budget-management.html"><i class='bx bx-bar-chart-alt'></i><span>Budgets</span></a></li>
-            <li class="menu-item"><a href="#"><i class='bx bx-cog'></i><span>Settings</span></a></li>
         </ul>
     </div>
 
     <div class="main-content">
+        <!---
         <div class="top-bar">
-            <i class='bx bx-bell'></i>
-            <div class="user-profile">A</div>
+            <i class='bx bx-bell' id="notificationBell"></i>
+                    <div class="notification-panel" id="notificationPanel" style="display:none;">
+                        <div class="notification-header">Notifications</div>
+                        <div class="notification-list" id="notificationList"></div>
+                    </div>
+                    <div class="user-profile" id="userInitial">A</div>
         </div>
+        -->
 
         <div class="header">
             <div class="header-title">
                 <h1>Expense Tracker</h1>
-                <p>Track and manage your personal expenses</p>
+                <p>Track and manage your personal and group expenses</p>
             </div>
             <div class="header-actions">
-                <button class="btn"><i class='bx bx-export' style="margin-right: 5px;"></i> Export PDF</button>
+                 <button class="btn" id="exportPdfBtn"><i class='bx bx-export' style="margin-right: 5px;"></i> Export PDF</button>
                 <button class="btn btn-primary" id="addExpenseBtn"><i class='bx bx-plus' style="margin-right: 5px;"></i> Add Expense</button>
             </div>
         </div>
 
         <div class="summary-cards" id="summaryCards">
             <div class="card">
-                <h3>Total Expenses</h3>
+                <h3>Total Personal Expenses</h3>
                 <div class="value" id="totalExpenses">₹0</div>
                 <div class="subtext" id="totalCount">0 expense</div>
             </div>
             <div class="card">
-                <h3>Top Category</h3>
+                <h3>Top Personal Category</h3>
                 <div class="value" id="topCategory">-</div>
                 <div class="subtext" id="topCategoryAmount">₹0</div>
             </div>
             <div class="card">
-                <h3>Average Expense</h3>
+                <h3>Average Personal Expense</h3>
                 <div class="value" id="avgExpense">₹0</div>
                 <div class="subtext">Per transaction</div>
             </div>
+            <div class="card">
+                <h3>Total Group Expenses</h3>
+                <div class="value" id="totalGroupExpenses">₹0</div>
+                <div class="subtext">Across all groups</div>
+            </div>
+
+            <div class="card">
+        <h3>Top Group Category</h3>
+        <div class="value" id="topGroupCategory">-</div>
+        <div class="subtext" id="topGroupCategoryAmount">₹0</div>
+    </div>
+    <div class="card">
+        <h3>Average Group Expense</h3>
+        <div class="value" id="avgGroupExpense">₹0</div>
+        <div class="subtext">Per transaction</div>
+    </div>
         </div>
 
         <div class="filters-search">
@@ -68,6 +88,11 @@
                     <option value="Travel">Travel</option>
                     <option value="Food">Food</option>
                     <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
                 </select>
                 <select id="sortFilter">
                     <option value="dateDesc">Sort by Date</option>
@@ -78,8 +103,17 @@
         </div>
 
         <div class="expenses-container">
-            <h2>Expenses <span style="font-weight: 400; color: var(--text-light); font-size: 0.9rem;" id="expenseCount"></span></h2>
-            <div id="expensesList"></div>
+            <h2>Expenses</h2>
+            <div class="expenses-lists">
+                <div class="expenses-list personal-expenses">
+                    <h3>Personal Expenses <span id="personalExpenseCount"></span></h3>
+                    <div id="personalExpensesList"></div>
+                </div>
+                <div class="expenses-list group-expenses">
+                    <h3>Group Expenses <span id="groupExpenseCount"></span></h3>
+                    <div id="groupExpensesList"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -102,6 +136,11 @@
                     <option value="Travel">Travel</option>
                     <option value="Food">Food</option>
                     <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
                 </select>
 
                 <label for="expenseDate">Date</label>
@@ -115,7 +154,28 @@
         </div>
     </div>
 
+        <!-- Profile Modal -->
+<div class="modal-bg" id="profileModalBg" style="display:none;">
+    <div class="modal">
+        <h2>User Profile</h2>
+        <div class="profile-details">
+            <div><strong>Name:</strong> <span id="profileName">-</span></div>
+            <div><strong>Email:</strong> <span id="profileEmail">-</span></div>
+            <div><strong>Phone Number:</strong> <span id="profilePhone">-</span></div>
+           <!-- <div><strong>Number:</strong> <span id="profileNumber">-</span></div> -->
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" id="closeProfileBtn">Close</button>
+        </div>
+    </div>
+</div>
 
-      <script type="module" src="./js/expense.js"></script>
+
+    <script type="module" src="./js/expense.js"></script>
+     <script type="module" src="./js/notification.js"></script>
+    <script type="module" src="./js/profile.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
