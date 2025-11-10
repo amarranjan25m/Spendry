@@ -7,11 +7,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="css/expense.css">
+  
 </head>
 <body>
-
-    <div class="sidebar">
-        <div class="logo">Spendry</div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" id="hamburgerMenu" aria-label="Open menu" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo">Spendry</div>
+        </div>
+        <div class="nav-right">
+           
+            </div>
+    </nav>
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
         <ul class="menu">
             <li class="menu-item"><a href="index.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
             <li class="menu-item active"><a href="expense.html"><i class='bx bx-receipt'></i><span>Expenses</span></a></li>
@@ -19,30 +35,18 @@
             <li class="menu-item"><a href="budget-management.html"><i class='bx bx-bar-chart-alt'></i><span>Budgets</span></a></li>
         </ul>
     </div>
-
+    <!-- Main Content -->
     <div class="main-content">
-        <!---
-        <div class="top-bar">
-            <i class='bx bx-bell' id="notificationBell"></i>
-                    <div class="notification-panel" id="notificationPanel" style="display:none;">
-                        <div class="notification-header">Notifications</div>
-                        <div class="notification-list" id="notificationList"></div>
-                    </div>
-                    <div class="user-profile" id="userInitial">A</div>
-        </div>
-        -->
-
         <div class="header">
             <div class="header-title">
                 <h1>Expense Tracker</h1>
                 <p>Track and manage your personal and group expenses</p>
             </div>
             <div class="header-actions">
-                 <button class="btn" id="exportPdfBtn"><i class='bx bx-export' style="margin-right: 5px;"></i> Export PDF</button>
+                <button class="btn" id="exportPdfBtn"><i class='bx bx-export' style="margin-right: 5px;"></i> Export PDF</button>
                 <button class="btn btn-primary" id="addExpenseBtn"><i class='bx bx-plus' style="margin-right: 5px;"></i> Add Expense</button>
             </div>
         </div>
-
         <div class="summary-cards" id="summaryCards">
             <div class="card">
                 <h3>Total Personal Expenses</h3>
@@ -64,19 +68,17 @@
                 <div class="value" id="totalGroupExpenses">₹0</div>
                 <div class="subtext">Across all groups</div>
             </div>
-
             <div class="card">
-        <h3>Top Group Category</h3>
-        <div class="value" id="topGroupCategory">-</div>
-        <div class="subtext" id="topGroupCategoryAmount">₹0</div>
-    </div>
-    <div class="card">
-        <h3>Average Group Expense</h3>
-        <div class="value" id="avgGroupExpense">₹0</div>
-        <div class="subtext">Per transaction</div>
-    </div>
+                <h3>Top Group Category</h3>
+                <div class="value" id="topGroupCategory">-</div>
+                <div class="subtext" id="topGroupCategoryAmount">₹0</div>
+            </div>
+            <div class="card">
+                <h3>Average Group Expense</h3>
+                <div class="value" id="avgGroupExpense">₹0</div>
+                <div class="subtext">Per transaction</div>
+            </div>
         </div>
-
         <div class="filters-search">
             <div class="search-box">
                 <i class='bx bx-search'></i>
@@ -101,7 +103,6 @@
                 </select>
             </div>
         </div>
-
         <div class="expenses-container">
             <h2>Expenses</h2>
             <div class="expenses-lists">
@@ -115,10 +116,14 @@
                 </div>
             </div>
         </div>
+        <!-- Notification Panel -->
+        <div class="notification-panel" id="notificationPanel" style="display:none; position: absolute; right: 40px; top: 70px; background: #fff; color: #222; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-width: 260px; z-index: 1500;">
+            <div class="notification-header" style="padding: 12px 16px; border-bottom: 1px solid #eee; font-weight: 600;">Notifications</div>
+            <div class="notification-list" id="notificationList" style="max-height: 300px; overflow-y: auto;"></div>
+        </div>
     </div>
-
     <!-- Expense Modal -->
-    <div class="modal" id="expenseModal">
+    <div class="modal" id="expenseModal" style="display:none;">
         <div class="modal-content">
             <span class="modal-close" id="closeModalBtn">&times;</span>
             <h2>Add Expense</h2>
@@ -126,10 +131,8 @@
             <form id="expenseForm" autocomplete="off">
                 <label for="expenseTitle">Title</label>
                 <input type="text" id="expenseTitle" required maxlength="50" placeholder="e.g. Grocery Shopping">
-
                 <label for="expenseAmount">Amount (₹)</label>
                 <input type="number" id="expenseAmount" required min="1" placeholder="e.g. 500">
-
                 <label for="expenseCategory">Category</label>
                 <select id="expenseCategory" required>
                     <option value="">Select Category</option>
@@ -142,10 +145,8 @@
                     <option value="Utilities">Utilities</option>
                     <option value="Miscellaneous">Miscellaneous</option>
                 </select>
-
                 <label for="expenseDate">Date</label>
                 <input type="date" id="expenseDate" required>
-
                 <div class="modal-actions">
                     <button type="button" class="btn btn-cancel" id="cancelModalBtn">Cancel</button>
                     <button type="submit" class="btn btn-add">Add</button>
@@ -153,29 +154,109 @@
             </form>
         </div>
     </div>
-
-        <!-- Profile Modal -->
-<div class="modal-bg" id="profileModalBg" style="display:none;">
-    <div class="modal">
-        <h2>User Profile</h2>
-        <div class="profile-details">
-            <div><strong>Name:</strong> <span id="profileName">-</span></div>
-            <div><strong>Email:</strong> <span id="profileEmail">-</span></div>
-            <div><strong>Phone Number:</strong> <span id="profilePhone">-</span></div>
-           <!-- <div><strong>Number:</strong> <span id="profileNumber">-</span></div> -->
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-cancel" id="closeProfileBtn">Close</button>
+    <!-- Profile Modal -->
+    <div class="modal-bg" id="profileModalBg" style="display:none;">
+        <div class="modal">
+            <h2>User Profile</h2>
+            <div class="profile-details">
+                <div><strong>Name:</strong> <span id="profileName">-</span></div>
+                <div><strong>Email:</strong> <span id="profileEmail">-</span></div>
+                <div><strong>Phone Number:</strong> <span id="profilePhone">-</span></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" id="closeProfileBtn">Close</button>
+            </div>
         </div>
     </div>
-</div>
-
-
+    <!-- Scripts -->
     <script type="module" src="./js/expense.js"></script>
-     <script type="module" src="./js/notification.js"></script>
+    <script type="module" src="./js/notification.js"></script>
     <script type="module" src="./js/profile.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Hamburger menu logic
+        const hamburger = document.getElementById('hamburgerMenu');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('.main-content');
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            hamburger.classList.add('open');
+            if (window.innerWidth <= 900) {
+                mainContent.style.marginLeft = '0';
+            }
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            hamburger.classList.remove('open');
+            if (window.innerWidth > 900) {
+                mainContent.style.marginLeft = '220px';
+            }
+        }
+        function toggleSidebar() {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        }
+        hamburger.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        // Close sidebar on menu click (mobile)
+        sidebar.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A' && window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        });
+        // Responsive sidebar margin
+        function handleResize() {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                hamburger.classList.remove('open');
+                mainContent.style.marginLeft = '220px';
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        // Keyboard accessibility for hamburger
+        hamburger.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                toggleSidebar();
+            }
+        });
+        // Notification bell toggle
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationPanel = document.getElementById('notificationPanel');
+        notificationBell.addEventListener('click', function () {
+            if (notificationPanel.style.display === 'none' || notificationPanel.style.display === '') {
+                notificationPanel.style.display = 'block';
+            } else {
+                notificationPanel.style.display = 'none';
+            }
+        });
+        // Profile modal logic
+        const userProfile = document.getElementById('userInitial');
+        const profileModalBg = document.getElementById('profileModalBg');
+        const closeProfileBtn = document.getElementById('closeProfileBtn');
+        if (userProfile && profileModalBg && closeProfileBtn) {
+            userProfile.addEventListener('click', () => {
+                profileModalBg.style.display = 'flex';
+            });
+            closeProfileBtn.addEventListener('click', () => {
+                profileModalBg.style.display = 'none';
+            });
+            profileModalBg.addEventListener('click', (e) => {
+                if (e.target === profileModalBg) {
+                    profileModalBg.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

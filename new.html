@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Expense Splitter - Spendry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/split.css">
+    <style>
+        body {
+            background: #fafafa;
+            color: #222;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+        }
+        /* Navbar styles */
+        .navbar {
+            width: 100%;
+            background: #222;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 60px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1300;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .navbar .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .navbar .logo {
+            padding-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #4CAF50;
+        }
+        .navbar .nav-menu {
+            display: flex;
+            gap: 18px;
+        }
+        .navbar .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.18s;
+        }
+        .navbar .nav-menu a.active,
+        .navbar .nav-menu a:hover {
+            background: #333;
+            color: #4CAF50;
+        }
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .navbar .user-profile {
+            background: #4CAF50;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .navbar .logout-btn, .navbar .export-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .navbar .logout-btn:hover {
+            background: #c0392b;
+        }
+        .navbar .export-btn {
+            background: #4CAF50;
+            margin-left: 4px;
+        }
+        .navbar .export-btn:hover {
+            background: #388e3c;
+        }
+        .navbar .bx-bell {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        /* Hamburger Icon */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            transition: background 0.2s;
+            padding: 6px;
+            margin-right: 16px;
+        }
+        .hamburger span {
+            display: block;
+            width: 26px;
+            height: 3px;
+            margin: 4px 0;
+            background: #222;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 220px;
+            height: calc(100% - 60px);
+            background: #fff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.07);
+            z-index: 1100;
+            transition: left 0.3s;
+            padding-top: 30px;
+        }
+        .sidebar .logo {
+            display: none;
+        }
+        .sidebar ul.menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar .menu-item {
+            margin-bottom: 8px;
+        }
+        .sidebar .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #222;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 6px;
+            transition: background 0.18s;
+        }
+        .sidebar .menu-item.active a,
+        .sidebar .menu-item a:hover {
+            background: #f0f0f0;
+            color: #4CAF50;
+        }
+        /* Sidebar closed on mobile */
+        @media (max-width: 900px) {
+            .sidebar {
+                left: -240px;
+                transition: left 0.3s;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100%;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 10px !important;
+            }
+            .cards, .chart-section, .bottom {
+                flex-direction: column !important;
+            }
+            .chart, .category, .recent, .quick {
+                width: 100% !important;
+                min-width: unset !important;
+            }
+            .sidebar {
+                width: 180px;
+                padding-top: 20px;
+            }
+            .navbar {
+                padding: 0 10px;
+            }
+        }
+        /* Overlay for sidebar on mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.18);
+            z-index: 1099;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+        /* Main content below navbar */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 60px;
+            padding: 32px 24px;
+            transition: margin-left 0.3s;
+        }
+        @media (max-width: 900px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        /* --- MODIFIED/ADDED --- */
+        .member-split-amount {
+            font-size: 0.95rem;
+            color: #2e7d32;
+            margin-top: 2px;
+            margin-bottom: 8px;
+        }
+        .member-list {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="hamburger" id="hamburgerMenu" aria-label="Open menu" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="logo">Spendry</div>
+        </div>
+        <div class="nav-right">
+            <i class='bx bx-bell' id="notificationBell"></i>
+            <div class="user-profile" id="userProfile">U</div>
+            <button class="logout-btn" id="logoutBtn">
+                <i class='bx bx-log-out' style="margin-right: 5px;"></i>Logout
+            </button>
+            <button class="export-btn" id="exportBtn">Export Report</button>
+        </div>
+    </nav>
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul class="menu">
+            <li class="menu-item"><a href="index.html"><i class='bx bxs-dashboard'></i><span>Dashboard</span></a></li>
+            <li class="menu-item"><a href="expense.html"><i class='bx bx-receipt'></i><span>Expenses</span></a></li>
+            <li class="menu-item active"><a href="split-bill.html"><i class='bx bx-group'></i><span>Split Bills</span></a></li>
+            <li class="menu-item"><a href="budget-management.html"><i class='bx bx-bar-chart-alt'></i><span>Budgets</span></a></li>
+        </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="header-title">
+                <h1>Expense Splitter</h1>
+                <p>Split bills and track group expenses with friends</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="joinGroupBtn"><i class='bx bx-user-plus'></i> Join Group</button>
+                <button class="text-btn" id="createGroupBtn">Create Group</button>
+            </div>
+        </div>
+        <div class="group-list" id="groupList"></div>
+    </div>
+    <!-- Group Detail Modal -->
+    <div class="modal" id="groupDetailModal">
+        <div class="modal-content group-detail" id="groupDetailContent">
+            <span class="modal-close" id="closeGroupDetailModalBtn">&times;</span>
+            <div id="groupDetailBody"></div>
+        </div>
+    </div>
+    <!-- Create Group Modal -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeCreateGroupModalBtn">&times;</span>
+            <h2>Create Group</h2>
+            <div class="modal-error" id="createGroupModalError"></div>
+            <form id="createGroupForm" autocomplete="off">
+                <label for="groupNameInput">Group Name</label>
+                <input type="text" id="groupNameInput" required maxlength="50" placeholder="e.g. Goa Tour">
+                <label for="groupDescInput">Description</label>
+                <input type="text" id="groupDescInput" maxlength="100" placeholder="e.g. Friends Goa Trip">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelCreateGroupBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Join Group Modal -->
+    <div class="modal" id="joinGroupModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeJoinGroupModalBtn">&times;</span>
+            <h2>Join Group</h2>
+            <div class="modal-error" id="joinGroupModalError"></div>
+            <form id="joinGroupForm" autocomplete="off">
+                <label for="inviteCodeInput">Invite Code</label>
+                <input type="text" id="inviteCodeInput" required maxlength="10" placeholder="e.g. 6H3K68">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelJoinGroupBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Join</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Add Splitted Expense Modal -->
+    <div class="modal" id="splittedExpenseModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeSplittedExpenseModalBtn">&times;</span>
+            <h2>Add Group Expense</h2>
+            <div class="modal-error" id="splittedModalError"></div>
+            <form id="splittedExpenseForm" autocomplete="off">
+                <label for="splittedExpenseTitle">Title</label>
+                <input type="text" id="splittedExpenseTitle" required maxlength="50" placeholder="e.g. Hotel Booking">
+                <label for="splittedExpenseAmount">Amount (₹)</label>
+                <input type="number" id="splittedExpenseAmount" required min="1" placeholder="e.g. 5000">
+                <label for="splittedExpenseCategory">Category</label>
+                <select id="splittedExpenseCategory" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Food">Food</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
+                <label for="splittedExpenseDate">Date</label>
+                <input type="date" id="splittedExpenseDate" required>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelSplittedExpenseBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeAddMemberModalBtn">&times;</span>
+            <h2>Add Member</h2>
+            <div class="modal-error" id="addMemberModalError"></div>
+            <form id="addMemberForm" autocomplete="off">
+                <label for="memberNameInput">Name</label>
+                <input type="text" id="memberNameInput" required maxlength="50" placeholder="e.g. John">
+                <label for="memberEmailInput">Email</label>
+                <input type="email" id="memberEmailInput" required maxlength="100" placeholder="e.g. john@email.com">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelAddMemberBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Edit Expense Modal -->
+    <div class="modal" id="editExpenseModal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeEditExpenseModalBtn">&times;</span>
+            <h2>Edit Group Expense</h2>
+            <div class="modal-error" id="editExpenseModalError"></div>
+            <form id="editExpenseForm" autocomplete="off">
+                <label for="editExpenseTitle">Title</label>
+                <input type="text" id="editExpenseTitle" required maxlength="50" placeholder="e.g. Hotel Booking">
+                <label for="editExpenseAmount">Amount (₹)</label>
+                <input type="number" id="editExpenseAmount" required min="1" placeholder="e.g. 5000">
+                <label for="editExpenseCategory">Category</label>
+                <select id="editExpenseCategory" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Food">Food</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Health">Health</option>
+                    <option value="Education">Education</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
+                <label for="editExpenseDate">Date</label>
+                <input type="date" id="editExpenseDate" required>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelEditExpenseBtn">Cancel</button>
+                    <button type="submit" class="btn btn-add">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Firebase SDKs (modular style) -->
+    <script type="module">
+        // ... [All your previous JS code remains unchanged here, as in your original post] ...
+        // (For brevity, not repeating the entire JS block here, but keep it as in your original file)
+        // --- Place your full script block here ---
+    </script>
+    <script>
+        // Hamburger menu logic
+        const hamburger = document.getElementById('hamburgerMenu');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('.main-content');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+            hamburger.classList.add('open');
+            if (window.innerWidth <= 900) {
+                mainContent.style.marginLeft = '0';
+            }
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            hamburger.classList.remove('open');
+            if (window.innerWidth > 900) {
+                mainContent.style.marginLeft = '220px';
+            }
+        }
+        function toggleSidebar() {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar on menu click (mobile)
+        sidebar.addEventListener('click', function (e) {
+            if (e.target.tagName === 'A' && window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        });
+
+        // Responsive sidebar margin
+        function handleResize() {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                hamburger.classList.remove('open');
+                mainContent.style.marginLeft = '220px';
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        // Keyboard accessibility for hamburger
+        hamburger.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                toggleSidebar();
+            }
+        });
+    </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.getElementById('hamburgerMenu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    // Open/close sidebar on hamburger click
+    hamburger.addEventListener('click', function(e) {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        hamburger.classList.toggle('open');
+    });
+
+    // Close sidebar when overlay is clicked
+    overlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        hamburger.classList.remove('open');
+    });
+
+    // Optional: Close sidebar when a menu item is clicked (for mobile UX)
+    sidebar.querySelectorAll('.menu-item a').forEach(link => {
+        link.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            hamburger.classList.remove('open');
+        });
+    });
+
+    // Accessibility: allow hamburger to be toggled with Enter/Space
+    hamburger.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            hamburger.click();
+        }
+    });
+});
+</script>
+</body>
+</html>

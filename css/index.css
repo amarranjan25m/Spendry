@@ -1,4 +1,31 @@
+/* Add these styles for the profile loader */
+.profile-loader {
+    display: none; /* Hidden by default */
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+.profile-loader .spinner {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #4CAF50; /* Your app's green */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
+/* Helper class to manage loading state */
+.profile-details.loading .profile-loader {
+    display: block;
+}
+.profile-details.loading .profile-content {
+    display: none;
+}
 
 /* Add to css/budget.css or your main CSS file */
 .modal-bg {
@@ -27,18 +54,30 @@
         .modal .btn-primary { background: var(--primary-color); color: #fff; }
         .modal .error-msg { color: var(--error-color); font-size: 0.95rem; margin-bottom: 10px; }
    
-
 .notification-panel {
-    position: absolute;
-    right: 40px;
-    top: 60px;
-    width: 320px;
+    position: fixed;           /* Fixed to viewport */
+    right: 16px;               /* Space from right edge */
+    top: 16px;                 /* Space from top edge */
+    width: 320px;              /* Default width */
+    max-width: 95vw;           /* Prevent overflow on small screens */
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    z-index: 100;
+    z-index: 1000;             /* Higher z-index for visibility */
     border: 1px solid #eee;
-    display: none;
+    display: none;             /* Show/hide with JS */
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 480px) {
+    .notification-panel {
+        right: 8px;
+        left: 8px;             /* Stretch to almost full width */
+        width: auto;           /* Let left/right take precedence */
+        max-width: 100vw;
+        top: 8px;
+        border-radius: 8px;
+    }
 }
 .notification-header {
     font-weight: 600;
