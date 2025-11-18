@@ -46,6 +46,26 @@ Spendry helps users understand where their money goes, split costs in groups, se
 ## 🖥️ Demo
 [Live Demo](https://spendry.vercel.app/)
 
+
+## Screenshots
+
+### Dashboard
+![Dashboard Screenshot](https://via.placeholder.com/468x300?text=Dashboard+Screenshot)
+
+### Budget Management
+![Budget Screenshot](https://via.placeholder.com/468x300?text=Budget+Management+Screenshot)
+
+### Expense Tracking
+![Expense Screenshot](https://via.placeholder.com/468x300?text=Expense+Tracking+Screenshot)
+
+### Split Bill
+![Split Bill Screenshot](https://via.placeholder.com/468x300?text=Split+Bill+Screenshot)
+
+### Notifications
+![Notifications Screenshot](https://via.placeholder.com/468x300?text=Notifications+Screenshot)
+
+
+
 ## 👥 Project Team
 | Name | Role |
 |------|------|
