@@ -22,8 +22,8 @@ Spendry helps users understand where their money goes, split costs in groups, se
 ### Functional Requirements
 - User Authentication, Profile Management
 - Expense Tracking (Personal & Group)
-- Bill Splitting (Equal/Percentage/Custom)
-- Group Settlements & History
+- Bill Splitting (Equal)
+- Group Settlements 
 - Spending Insights & Category Reports
 - PDF/CSV Export
 - Firebase Sync & Data Handling
