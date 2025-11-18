@@ -53,9 +53,7 @@ Spendry helps users understand where their money goes, split costs in groups, se
   <img width="350" height="300" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/5f196f57-38ae-4d8b-a63e-2ca160abaf7a" />
   <img width="350" height="300" alt="Budget Management Screenshot" src="https://github.com/user-attachments/assets/1f2f9a46-f78a-48ac-8855-3d8fe73a680e" />
   <img width="350" height="300" alt="image" src="https://github.com/user-attachments/assets/4d7dd4ee-2b9a-4066-8b37-7de474b69fc3" />
-
 </div>
-
 
 ### Expense Tracking
 ![Expense Screenshot](https://via.placeholder.com/468x300?text=Expense+Tracking+Screenshot)
