@@ -12,10 +12,10 @@ Spendry helps users understand where their money goes, split costs in groups, se
 - Trello Board: http://tiny.cc/3j7v001
 
 ## 📝 Acknowledgements
--We express our sincere gratitude to all those who contributed to the development of Spendry – Personal Finance & Expense Splitter.
--We extend our heartfelt thanks to **Dr. Nilotpal Chakraborty** for his invaluable guidance, insights, and continuous support throughout the project. His mentorship played a crucial role in shaping the system’s architecture, analysis, and final execution.
--Special thanks to our project team members for their dedication and collaboration in bringing this application to life.
--We also acknowledge the open-source community and resources that inspired us during documentation and development
+- We express our sincere gratitude to all those who contributed to the development of Spendry – Personal Finance & Expense Splitter.
+- We extend our heartfelt thanks to **Dr. Nilotpal Chakraborty** for his invaluable guidance, insights, and continuous support throughout the project. His mentorship played a crucial role in shaping the system’s architecture, analysis, and final execution.
+- Special thanks to our project team members for their dedication and collaboration in bringing this application to life.
+- We also acknowledge the open-source community and resources that inspired us during documentation and development
 
 ## 🚀 Project Overview (From SRS)
 
