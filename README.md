@@ -43,6 +43,9 @@ Spendry helps users understand where their money goes, split costs in groups, se
 - Multi-currency support
 - Gamification features
 
+## 🖥️ Demo
+[Live Demo](https://spendry.vercel.app/)
+
 ## 👥 Project Team
 | Name | Role |
 |------|------|
@@ -50,12 +53,7 @@ Spendry helps users understand where their money goes, split costs in groups, se
 | Amar Ranjan | Lead |
 | Mayangmayum Ashish | Developer |
 | Poulami Mukherjee | Analyst |
-| Subhashis Kar | Tester + AI Developer |
-
-## 🧪 Running Tests
-```bash
-npm run test
-```
+| Subhashis Kar | Tester |
 
 ## 💬 Support
 amar.ranjan25m@iiitg.ac.in
