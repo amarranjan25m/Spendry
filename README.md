@@ -12,9 +12,10 @@ Spendry helps users understand where their money goes, split costs in groups, se
 - Trello Board: http://tiny.cc/3j7v001
 
 ## 📝 Acknowledgements
-- Awesome Readme Templates
-- Awesome README
-- How to Write a Good README
+-We express our sincere gratitude to all those who contributed to the development of Spendry – Personal Finance & Expense Splitter.
+-We extend our heartfelt thanks to Dr. Nilotpal Chakraborty for his invaluable guidance, insights, and continuous support throughout the project. His mentorship played a crucial role in shaping the system’s architecture, analysis, and final execution.
+-Special thanks to our project team members for their dedication and collaboration in bringing this application to life.
+-We also acknowledge the open-source community and resources that inspired us during documentation and development
 
 ## 🚀 Project Overview (From SRS)
 
@@ -25,7 +26,7 @@ Spendry helps users understand where their money goes, split costs in groups, se
 - Group Settlements & History
 - Spending Insights & Category Reports
 - PDF/CSV Export
-- Firebase Sync & Offline Handling
+- Firebase Sync & Data Handling
 - Notifications & Budget Alerts
 
 ### Non-Functional Requirements
@@ -57,26 +58,28 @@ npm run test
 ```
 
 ## 💬 Support
-team@nanoplex.in
+amar.ranjan25m@iiitg.ac.in
 
 ## 🗺️ Roadmap
-- Browser extensions  
-- Mobile PWA  
-- Advanced analytics  
-- More integrations  
+
+| Phase | Week | Task | Date/Target | Team |
+|-------|------|------|-------------|------|
+| Phase 1 – Planning & Documentation | Week 1 | SRS Documentation | 02-Sep-2025 | Lead + Analyst + All Team |
+| Phase 1 – Planning & Documentation | Week 1 | Analysis & Design Document Preparation | 07-Sep-2025 | All Team |
+| Phase 2 – Design & Architecture | Week 2 | Database Schema + UI Mockup | Week 2 Monday — 06-Oct-2025 | Architect + Developer + Lead |
+| Phase 3 – Development | Week 3 | Frontend Development + Firebase Connection | Week 4 Monday — 13-Oct-2025 | Developer + Architect + Lead |
+| Phase 3 – Development | Week 4 | Backend Setup + Home Page Design + Initial Testing | Week 5 Monday — 27-Oct-2025 | Developer + Tester + Lead |
+| Phase 3 – Development | Week 5 | Expense Splitting Module + Reports Module | Week 6 Monday — 27-Oct-2025 | Developer + Analyst + Lead |
+| Phase 4 – Testing & Integration | Week 6 | Notifications + Integration Testing | Week 7 Monday — 03-Nov-2025 | Developer + Tester + Lead |
+| Phase 4 – Testing & Integration | Week 7 | QA Testing, Bug Fixing & UI Polishing | Week 8 Monday — 10-Nov-2025 | Tester + Lead |
+| Phase 5 – Release | Week 8 | Deployment + Final Documentation | Week 9 Monday — 17-Nov-2025 | Leader + Analyst + Lead |
+
+
 
 ## 🖥️ Run Locally
 ```bash
-git clone https://link-to-project
+git clone https://github.com/amarranjan25m/Spendry.git
 cd spendry
-npm install
-npm run start
-```
-
-## 🔐 Environment Variables
-```
-API_KEY=
-ANOTHER_API_KEY=
 ```
 
 ## ⭐ Features
@@ -84,18 +87,15 @@ ANOTHER_API_KEY=
 - Smart Bill Splitting
 - Budget Alerts
 - Firebase Sync
-- Light/Dark Mode
-- Cross‑platform support
+- Diffrent resolution support
 
 ## 🛠️ Tech Stack
 - Client: HTML, CSS, JavaScript
 - Backend: Firebase Auth + Realtime Database
-- Hosting: Firebase Hosting
+- Hosting: Vercel
 
 ## 📜 License
 MIT License
 
 ## 🔗 Related
 - Awesome README
-- Budgeting Tools
-- Expense Sharing Apps
